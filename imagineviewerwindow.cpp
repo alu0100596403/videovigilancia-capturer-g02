@@ -22,10 +22,17 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::ImagineViewerWindow)
 {
+    movie_ = new QMovie();
+     // ui->label->setMovie(movie_);
+
+     connect(movie_, SIGNAL(updated(const QRect&)),
+             this, SLOT(on_movie_updated(const QRect&)));
 
     ui->setupUi(this);
-   movie_ = new QMovie("video.mjpeg");
+ /*  movie_ = new QMovie("video.mjpeg");
     ui->Image->setMovie(movie_);
+  */
+
 }
 
 
@@ -39,6 +46,12 @@ ImagineViewerWindow::~ImagineViewerWindow()
 void ImagineViewerWindow::on_pushButton_clicked()
 {
     qApp->quit();
+}
+
+void ImagineViewerWindow::on_movie_updated(const QRect& rect)
+{
+    QPixmap pixmap = movie_->currentPixmap();
+    ui->Image->setPixmap(pixmap);
 }
 
 /*
@@ -58,8 +71,21 @@ void ImagineViewerWindow::on_actionAbrir_triggered()
         file.close();
     }
 
-}
-*/
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void ImagineViewerWindow::on_actionAbrir_triggered()
 {
@@ -82,3 +108,8 @@ void ImagineViewerWindow::on_actionAbrir_triggered()
     movie_->start();    // Iniciar la reproducción de la animación
     }
 }
+
+
+
+
+

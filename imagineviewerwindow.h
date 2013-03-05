@@ -21,6 +21,8 @@ private slots:
 
     void on_actionAbrir_triggered();
 
+    void on_movie_updated(const QRect& rect);
+
 private:
     Ui::ImagineViewerWindow *ui;
     QMovie *movie_;
