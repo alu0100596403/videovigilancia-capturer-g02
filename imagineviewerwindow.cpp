@@ -5,34 +5,70 @@
 #include <QMessageBox>
 #include <QMovie>
 #include <Qlabel>
+#include <QWaitCondition>
+#include <QMutex>
+#include <QDebug>
+
+const int BufferSize = 20;       // Tamaño de la cola
+QImage buffer[BufferSize];       // Cola de frames como array de C
+int numUsedBufferItems = 0;      // Contador de frames en la cola
+
+QWaitCondition bufferNotEmpty;
+QWaitCondition bufferNotFull;
+QMutex mutex;
 
 
-/*
-ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ImagineViewerWindow)
-{
-    ui->setupUi(this);
-}
-*/
 
 ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::ImagineViewerWindow){
 
  movie_ = new QMovie();
-    // ui->label->setMovie(movie_);
+    ui->setupUi(this);
     connect(movie_, SIGNAL(updated(const QRect&)),
             this, SLOT(on_movie_updated(const QRect&)));
 
+//AQUI SERIA PONER LOS CONECTORES de los slots
+
+       // Pasar la imagen a la instancia de SorterWorker
+       connect(this, SIGNAL(enviar_imagen(QImage)),
+           &procesadora, SLOT(recibir_imagen(QImage )));
+
+       // Señal de que se ha recibido la imagen
+       connect(&procesadora, SIGNAL(devolver_senal(QImage)),
+           this, SLOT(recibir_imagen( QImage)));
+
+
+       // Migrar la instancia de pocesadora al hilo de trabajo
+       procesadora.moveToThread(&workingThread_);
+
+       // Iniciar el hilo de trabajo
+       workingThread_.start();
+
+
+
 }
+
 
 ImagineViewerWindow::~ImagineViewerWindow(){
     delete ui;
 }
 
+
+void ImagineViewerWindow :: recibir_imagen(const QImage& imagen){
+
+    QPixmap pixmap = QPixmap::fromImage ( imagen );
+    // connvertir de imagen a pixmap con un metodo de Qpixmap
+
+    ui->Image->setPixmap(pixmap);
+
+
+}
+
+
 void ImagineViewerWindow::on_pushButton_clicked(){
     qApp->quit();
 
 }
+
 
 /*
 void ImagineViewerWindow::on_actionAbrir_triggered()
@@ -53,6 +89,8 @@ void ImagineViewerWindow::on_actionAbrir_triggered()
 
 }
 */
+
+
 
 void ImagineViewerWindow::on_actionAbrir_triggered(){
 
@@ -76,54 +114,13 @@ void ImagineViewerWindow::on_actionAbrir_triggered(){
     }
 }
 
-void MyThread::run(){
 
-    // Aquí el código a ejecutar en el hilo...
+
+
+void ImagineViewerWindow::on_movie_updated(const QRect& rect){
+    QImage imagen = movie_->currentImage();
+    emit enviar_imagen(imagen);
+
 }
 
-void MovieViewerWindow::on_movie_updated(const QRect& rect){
-    QPixmap pixmap = movie_->currentPixmap();
-    ui->label->setPixmap(pixmap);
-}
 
-
-
-Sorter::Sorter() : QObject(){
-    qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
-
-    // Registrar los parámetros de la señales. Necesitamos registrar
-    // QList<int> porque no es un tipo conocido por el sistema de
-    // meta-objetos de Qt.
-    qRegisterMetaType< QVector<int> >("QVector<int>");
-
-    // Pasar la petición de ordenar a la instancia de SorterWorker
-    connect(this, SIGNAL(sortingRequested(QVector<int>)),
-        &sorterWorker_, SLOT(doSort(QVector<int>)));
-    // Ser notificado cuando el vector haya sido ordenado
-    connect(&sorterWorker_, SIGNAL(vectorSorted(QVector<int>)),
-        this, SLOT(vectorSorted(QVector<int>)));
-
-    // Migrar la instancia de SorterWorker al hilo de trabajo
-    sorterWorker_.moveToThread(&workingThread_);
-
-    // Iniciar el hilo de trabajo
-    workingThread_.start();
-}
-
-Sorter::~Sorter(){
-
-    // Le decimos al bucle de mensajes del hilo que se detenga
-    workingThread_.quit();
-    // Ahora esperamos a que el hilo de trabajo termine
-    workingThread_.wait();
-}
-
-void Sorter::sortAsync(const QVector<int>& list){
-    qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
-
-    emit sortingRequested(list);
-}
-
-void Sorter::vectorSorted(const QVector<int>& list){
-    qDebug() << list;
-}

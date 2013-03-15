@@ -13,9 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        imagineviewerwindow.cpp
+        imagineviewerwindow.cpp \
+    procesadora.cpp
 
 HEADERS  += \
-    imagineviewerwindow.h
+    imagineviewerwindow.h \
+    procesadora.h
 
 FORMS    += imagineviewerwindow.ui
