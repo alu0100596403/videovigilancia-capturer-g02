@@ -17,17 +17,7 @@ signals:
 public slots:
     // Método encargado del ordenamiento
 
-   void recibir_imagen(const QImage& imagen ) {
-
-        qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
-
-        // AQUI VA EL CODIGO DE DECTECCION DE MOVIENTO
-
-        emit devolver_senal(imagen); // se devuelve la imagen y el vector de rectangulos
-
-
-
-    }
+   void recibir_imagen(const QImage& imagen );
 
 
     
