@@ -7,12 +7,16 @@
 class Procesadora : public QObject
 {
     Q_OBJECT
+
+private:
+
+    cv::BackgroundSubtractorMOG2 backgroundSubtractor;
 public:
     explicit Procesadora(QObject *parent = 0);
 
 signals:
     // Señal emitida cuando el vector ha sido ordenado
-      void devolver_senal(const QImage& imagen);
+      void devolver_senal(const QImage& imagen, const QVector vector_rectangulo);
 
 public slots:
     // Método encargado del ordenamiento

@@ -3,13 +3,15 @@
 # Project created by QtCreator 2013-02-05T12:41:50
 #
 #-------------------------------------------------
-//lineas para lo que viene despues .
+#lineas para lo que viene despues .
 
 PROTOS = sensorsreport.proto
 include(protobuf.pri)
 
-//linea para deteccion de movimiento.
+#linea para deteccion de movimiento.
 include(QtOpenCV.pri)
+
+add_opencv_modules(core video imgproc, 2.4.4)
 
 QT       += core gui
 

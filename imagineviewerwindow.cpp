@@ -8,6 +8,8 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QDebug>
+#include <QPainter>
+
 
 const int BufferSize = 20;       // Tamaño de la cola
 QImage buffer[BufferSize];       // Cola de frames como array de C
@@ -53,7 +55,12 @@ ImagineViewerWindow::~ImagineViewerWindow(){
 }
 
 
-void ImagineViewerWindow :: recibir_imagen(const QImage& imagen){
+void ImagineViewerWindow :: recibir_imagen(const QImage& imagen, QVector vector_rectangulos){
+
+    QPainter pintura( QPaintDevice * imagen );
+
+    pintura.drawRects(vector_rectangulos);
+
 
     QPixmap pixmap = QPixmap::fromImage ( imagen );
     // connvertir de imagen a pixmap con un metodo de Qpixmap
@@ -118,6 +125,7 @@ void ImagineViewerWindow::on_actionAbrir_triggered(){
 
 
 void ImagineViewerWindow::on_movie_updated(const QRect& rect){
+
     QImage imagen = movie_->currentImage();
     emit enviar_imagen(imagen);
 

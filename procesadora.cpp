@@ -3,19 +3,22 @@
 Procesadora::Procesadora(QObject *parent) :
     QObject(parent)
 {
+         // Desactivar la detección de sombras
+            backgroundSubtractor.nmixtures = 3;
+
+           // desactivar deteccion de movimiento
+           backgroundSubtractor.bShadowDetection = false;
 }
 
 
-void recibir_imagen(const QImage& imagen ) {
+void Procesadora :: recibir_imagen(const QImage& imagen ) {
 
      qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
 
      // AQUI VA EL CODIGO DE DECTECCION DE MOVIENTO
 
          // channels == 0 significa autodetección
-         cv::Mat image2Mat(const QImage &imagen,
-                           int channels = 0,
-                           MatChannelOrder rgbOrder = MCO_BGR);
+         cv::Mat imagenmat=image2Mat(imagen);
 
          // std::vector<cv::Mat> images = <vector de imágenes en cv::Mat>
 
@@ -27,13 +30,7 @@ void recibir_imagen(const QImage& imagen ) {
          // cv::BackgroundSubtractorMOG2(history=500,
          //                              varThreshold=16,
          //                              bShadowDetection=true)
-         cv::BackgroundSubtractorMOG2 backgroundSubtractor;
-         backgroundSubtractor.nmixtures = 3;
 
-         // Desactivar la detección de sombras
-         backgroundSubtractor.bShadowDetection = false;
-
-         for (ImagesTypes::const_iterator i = images.begin(); i < images.end(); ++i) {
              // Sustracción del fondo:
              //  1. El objeto sustractor compara la imagen en i con su
              //     estimación del fondo y devuelve en foregroundMask una
@@ -42,7 +39,7 @@ void recibir_imagen(const QImage& imagen ) {
              //  2. El objeto sustractor actualiza su estimación del fondo
              //     usando la imagen en i.
              cv::Mat foregroundMask;
-             backgroundSubtractor(*i, foregroundMask);
+             backgroundSubtractor(imagenmat, foregroundMask);
 
              // Operaciones morfolóficas para eliminar las regiones de
              // pequeño tamaño. Erode() las encoge y dilate() las vuelve a
@@ -57,14 +54,27 @@ void recibir_imagen(const QImage& imagen ) {
              cv::findContours(foregroundMask, contours, CV_RETR_EXTERNAL,
                               CV_CHAIN_APPROX_NONE);
 
+             // aqui tiene que ir un bucle que vaya por todos los vectores y se los pasamos aboundingRect
+             // hay que pasar de CVrect a Qrect
+             //Qvect vector
+                cv::Rect rect;
+
+             for (int i = 0; i < contours.length();i++){
+                rect = cv::boundingRect(contours[i]);
+                QRect rect1(rect.x, rect.y,rect.width, rect.height);
+                QVector vector_rectangulo[i]=rect1;
+             }
+
+
+
              // Aquí va el código ódigo que usa los contornos encontrados...
-             // P. ej. usar cv::boundingRect() para obtener el cuadro
+             // P. ej. usar  para obtener el cuadro
              // delimitador de cada uno y pintarlo en la imagen original
          }
 
 
 
-     emit devolver_senal(imagen); // se devuelve la imagen y el vector de rectangulos
+     emit devolver_senal(imagen,vector_rectangulo); // se devuelve la imagen y el vector de rectangulos
 
 
 

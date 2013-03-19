@@ -25,7 +25,7 @@ class ImagineViewerWindow : public QMainWindow {
 
         void on_movie_updated(const QRect& rect);
 
-        void recibir_imagen(const QImage& imagen); // este ademas recibe el vector de rectagulos y muestra la imagen y los rectangulos
+        void recibir_imagen(const QImage& imagen, const QVector vector_rectangulos); // este ademas recibe el vector de rectagulos y muestra la imagen y los rectangulos
 
     private:
         Ui::ImagineViewerWindow *ui;
