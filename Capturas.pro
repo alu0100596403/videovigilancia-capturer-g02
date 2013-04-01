@@ -3,15 +3,18 @@
 # Project created by QtCreator 2013-02-05T12:41:50
 #
 #-------------------------------------------------
+#Para poder usa QNetwork
+QT += network
+
 #lineas para lo que viene despues .
 
-PROTOS = sensorsreport.proto
-include(protobuf.pri)
+#PROTOS = sensorsreport.proto
+#include(protobuf.pri)
 
 #linea para deteccion de movimiento.
 include(QtOpenCV.pri)
 
-add_opencv_modules(core video imgproc, 2.4.4)
+add_opencv_modules(core video imgproc)
 
 QT       += core gui
 
@@ -23,13 +26,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         imagineviewerwindow.cpp \
-    procesadora.cpp \
-    cvmatandqimage.cpp
+    procesadora.cpp
 
 HEADERS  += \
     imagineviewerwindow.h \
     procesadora.h \
-    cvmatandqimage.h
+     cvmatandqimage \
+     cvmatandqimage
 
 FORMS    += imagineviewerwindow.ui
 

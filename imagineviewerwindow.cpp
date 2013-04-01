@@ -1,10 +1,10 @@
 #include "imagineviewerwindow.h"
 #include "ui_imagineviewerwindow.h"
-#include <Qfile>
+#include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMovie>
-#include <Qlabel>
+#include <QLabel>
 #include <QWaitCondition>
 #include <QMutex>
 #include <QDebug>
@@ -25,18 +25,19 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
 
  movie_ = new QMovie();
     ui->setupUi(this);
+
     connect(movie_, SIGNAL(updated(const QRect&)),
             this, SLOT(on_movie_updated(const QRect&)));
 
 //AQUI SERIA PONER LOS CONECTORES de los slots
 
        // Pasar la imagen a la instancia de SorterWorker
-       connect(this, SIGNAL(enviar_imagen(QImage)),
-           &procesadora, SLOT(recibir_imagen(QImage )));
+       connect(this, SIGNAL(enviar_imagen(const QImage&)),
+           &procesadora, SLOT(recibir_imagen(const QImage& )));
 
        // Señal de que se ha recibido la imagen
-       connect(&procesadora, SIGNAL(devolver_senal(QImage)),
-           this, SLOT(recibir_imagen( QImage)));
+       connect(&procesadora, SIGNAL(devolver_senal(const QImage&, const QVector <QRect>)),
+           this, SLOT(recibir_imagen (const QImage&, const QVector <QRect>)));
 
 
        // Migrar la instancia de pocesadora al hilo de trabajo
@@ -55,14 +56,16 @@ ImagineViewerWindow::~ImagineViewerWindow(){
 }
 
 
-void ImagineViewerWindow :: recibir_imagen(const QImage& imagen, QVector vector_rectangulos){
+void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QRect> &vector_rectangulos){
+    QImage imagen2 = imagen;
 
-    QPainter pintura( QPaintDevice * imagen );
+
+    QPainter pintura(&imagen2 );
 
     pintura.drawRects(vector_rectangulos);
 
 
-    QPixmap pixmap = QPixmap::fromImage ( imagen );
+    QPixmap pixmap = QPixmap::fromImage ( imagen2 );
     // connvertir de imagen a pixmap con un metodo de Qpixmap
 
     ui->Image->setPixmap(pixmap);
@@ -119,12 +122,13 @@ void ImagineViewerWindow::on_actionAbrir_triggered(){
         }
     movie_->start();    // Iniciar la reproducción de la animación
     }
+
 }
 
 
 
 
-void ImagineViewerWindow::on_movie_updated(const QRect& rect){
+void ImagineViewerWindow::on_movie_updated(const QRect& ){
 
     QImage imagen = movie_->currentImage();
     emit enviar_imagen(imagen);
