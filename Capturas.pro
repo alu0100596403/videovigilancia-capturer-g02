@@ -8,8 +8,8 @@ QT += network
 
 #lineas para lo que viene despues .
 
-#PROTOS = sensorsreport.proto
-#include(protobuf.pri)
+PROTOS = Mensaje.proto
+include(protobuf.pri)
 
 #linea para deteccion de movimiento.
 include(QtOpenCV.pri)
@@ -26,16 +26,19 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         imagineviewerwindow.cpp \
-    procesadora.cpp
+    procesadora.cpp \
+    Cliente.cpp
 
 HEADERS  += \
     imagineviewerwindow.h \
     procesadora.h \
      cvmatandqimage \
-     cvmatandqimage
+     cvmatandqimage \
+    servidor.h
 
 FORMS    += imagineviewerwindow.ui
 
 OTHER_FILES += \
     opencv.pri \
-    QtOpenCV.pri
+    QtOpenCV.pri \
+    Mensaje.proto
