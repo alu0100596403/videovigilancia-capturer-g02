@@ -1,7 +1,9 @@
-#include "procesadora.h"
+ #include "procesadora.h"
 #include <cvmatandqimage.h>
 #include <QVector>
 #include <QMetaType>
+ #include <QTcpSocket>
+ #include <QSettings>
 
 Procesadora::Procesadora(QObject *parent) :
     QObject(parent) , backgroundSubtractor(500,16,false)
@@ -55,8 +57,6 @@ void Procesadora :: recibir_imagen(const QImage& imagen ) {
              cv::findContours(foregroundMask, contours, CV_RETR_EXTERNAL,
                               CV_CHAIN_APPROX_NONE);
 
-             // aqui tiene que ir un bucle que vaya por todos los vectores y se los pasamos aboundingRect
-             // hay que pasar de CVrect a Qrect
              //Qvect vector
               cv::Rect rect;
 
@@ -76,6 +76,7 @@ void Procesadora :: recibir_imagen(const QImage& imagen ) {
              // delimitador de cada uno y pintarlo en la imagen original
 
      emit devolver_senal(imagen,vector_rectangulo); // se devuelve la imagen y el vector de rectangulos
+
 
 
 

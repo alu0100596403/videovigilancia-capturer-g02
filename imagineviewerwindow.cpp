@@ -9,7 +9,8 @@
 #include <QMutex>
 #include <QDebug>
 #include <QPainter>
-
+ #include <QTcpSocket>
+ #include <QSettings>
 
 const int BufferSize = 20;       // Tamaño de la cola
 QImage buffer[BufferSize];       // Cola de frames como array de C
@@ -46,6 +47,14 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
        // Iniciar el hilo de trabajo
        workingThread_.start();
 
+       //incializamos el socket :)
+
+       socket = new QTcpSocket(this);
+       //conectamos con el servidor
+       socket->connectToHost(ipconfig->value("Configuracion_IP").toString(),2000);
+
+       //Aqui creamos un fichero de configuraciion, en el que vamos a poner la ip
+       ipconfig = new QSettings("./Configuracion_IP","IniFormat",this);
 
 
 }
@@ -67,9 +76,11 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
 
     QPixmap pixmap = QPixmap::fromImage ( imagen2 );
     // connvertir de imagen a pixmap con un metodo de Qpixmap
-
-    ui->Image->setPixmap(pixmap);
-
+    //lo que hay que hacer en el cliente :)
+    /* Ahora recibimos la imagen con el moviento, tenmos que el vector de rectngulos sea diferente de 0
+      de esta forma mandamos solo las imagenes en las que halla movimiento, las recibimos en el servidor y se
+      muestran alli, de manera que aqui ya no lo mostramos :)
+    */
 
 }
 
@@ -131,6 +142,12 @@ void ImagineViewerWindow::on_actionAbrir_triggered(){
 void ImagineViewerWindow::on_movie_updated(const QRect& ){
 
     QImage imagen = movie_->currentImage();
+
+    //mostramos la imagen antes de mandarla.
+
+    QPixmap pixmap = QPixmap::fromImage ( imagen );
+    ui->Image->setPixmap(pixmap);
+
     emit enviar_imagen(imagen);
 
 }

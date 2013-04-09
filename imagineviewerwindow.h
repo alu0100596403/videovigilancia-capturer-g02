@@ -5,6 +5,8 @@
 #include <QDebug>
 #include"procesadora.h"
 #include <QThread>
+#include <QTcpSocket>
+#include <QSettings>
 
 namespace Ui {
 class ImagineViewerWindow;
@@ -33,7 +35,8 @@ class ImagineViewerWindow : public QMainWindow {
         QMovie *movie_;
         QThread workingThread_;
         Procesadora procesadora;
-
+        QTcpSocket  *socket; // socket, para conectar con el servidor
+        QSettings *ipconfig;
     signals:
         // Señal para comunicarnos con el hilo de trabajo
         void enviar_imagen(const QImage& imagen);

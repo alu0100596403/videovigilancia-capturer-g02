@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <QVector>
 #include <QRect>
+#include <QTcpSocket>
 
 class Procesadora : public QObject
 {
