@@ -9,8 +9,10 @@
 #include <QMutex>
 #include <QDebug>
 #include <QPainter>
- #include <QTcpSocket>
- #include <QSettings>
+#include <QTcpSocket>
+#include <QSettings>
+#include <QBuffer>
+
 
 const int BufferSize = 20;       // Tamaño de la cola
 QImage buffer[BufferSize];       // Cola de frames como array de C
@@ -49,12 +51,18 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
 
        //incializamos el socket :)
 
-       socket = new QTcpSocket(this);
-       //conectamos con el servidor
-       socket->connectToHost(ipconfig->value("Configuracion_IP").toString(),2000);
+       socket = new QTcpSocket(this); // Ahora recibimos la imagen con el moviento, tenmos que el v
 
        //Aqui creamos un fichero de configuraciion, en el que vamos a poner la ip
-       ipconfig = new QSettings("./Configuracion_IP","IniFormat",this);
+
+      ipconfig = new QSettings("./Configuracion_IP.ini","IniFormat",this);
+
+      ipconfig->setValue("IP", "192.168.1.1");
+
+              //conectamos con el servidor
+       socket->connectToHost(ipconfig->value("IP").toString(),2000);
+
+       message = new Mensaje(); // inicializacion del mensaje.
 
 
 }
@@ -76,11 +84,48 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
 
     QPixmap pixmap = QPixmap::fromImage ( imagen2 );
     // connvertir de imagen a pixmap con un metodo de Qpixmap
+
     //lo que hay que hacer en el cliente :)
+
     /* Ahora recibimos la imagen con el moviento, tenmos que el vector de rectngulos sea diferente de 0
       de esta forma mandamos solo las imagenes en las que halla movimiento, las recibimos en el servidor y se
       muestran alli, de manera que aqui ya no lo mostramos :)
     */
+
+    // enviamos solo las imagenes con movimientos.
+
+    //antes de enviar la imagen tenemos que convertirla en un array de bytes
+
+    QBuffer buffer;
+    imagen2.save(&buffer, "jpg");// writes image into ba in jpg format
+
+    // en esta parte estamos obteniendo el array interno que se creo en el buffer
+    QByteArray bytes = buffer.buffer();
+
+    // Guardamos en un string la imagen
+    std::string imagenjpg(bytes.constData(),bytes.size());
+
+    //le damos el valor al mensaje
+    message->set_imagenes(imagenjpg);
+
+
+    //Antes de poder mandar el mensaje tiene que ser serializado de la siguiente forma
+
+    // Serializar el mensaje
+    std::string buffer2;
+    message->SerializeToString(&buffer2);
+
+
+   // El metodo write() solo trabaja con char, por esto ahora  pasamos de string a char
+
+
+    const char *paquete = buffer2.c_str();
+
+
+    if ( vector_rectangulos.size() != 0){
+        socket->write(paquete, sizeof(paquete));
+
+    }
 
 }
 

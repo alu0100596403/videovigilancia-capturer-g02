@@ -7,6 +7,8 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QSettings>
+#include <Mensaje.pb.h>
+
 
 namespace Ui {
 class ImagineViewerWindow;
@@ -35,8 +37,11 @@ class ImagineViewerWindow : public QMainWindow {
         QMovie *movie_;
         QThread workingThread_;
         Procesadora procesadora;
+
         QTcpSocket  *socket; // socket, para conectar con el servidor
-        QSettings *ipconfig;
+        QSettings *ipconfig; // Qsettings object, usado para  la configuracion de la IP
+        Mensaje *message; // mensaje implementado con el protocolo para enviar.
+
     signals:
         // Señal para comunicarnos con el hilo de trabajo
         void enviar_imagen(const QImage& imagen);
