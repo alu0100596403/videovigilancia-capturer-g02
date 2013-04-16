@@ -57,9 +57,7 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
 
       ipconfig = new QSettings("./Configuracion_IP.ini","IniFormat",this);
 
-      ipconfig->setValue("IP", "192.168.1.1");
-
-              //conectamos con el servidor
+       //conectamos con el servidor
        socket->connectToHost(ipconfig->value("IP").toString(),2000);
 
        message = new Mensaje(); // inicializacion del mensaje.
