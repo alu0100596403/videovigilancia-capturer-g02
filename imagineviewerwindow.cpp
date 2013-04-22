@@ -121,7 +121,10 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
 
 
     if ( vector_rectangulos.size() != 0){
-        socket->write(paquete, sizeof(paquete));
+        int tamano = buffer2.size();
+
+        socket->write(&tamano, sizeof(tamano));
+        socket->write(paquete, buffer2.size());
 
     }
 
