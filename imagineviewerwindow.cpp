@@ -11,6 +11,8 @@
 #include <QPainter>
 
 
+ //// ESTE ES EL CODIGO DEL SERVIDOR
+
 const int BufferSize = 20;       // Tamaño de la cola
 QImage buffer[BufferSize];       // Cola de frames como array de C
 int numUsedBufferItems = 0;      // Contador de frames en la cola
@@ -46,7 +48,17 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
        // Iniciar el hilo de trabajo
        workingThread_.start();
 
+       // incializamoe el socket que nos conerctara con el cliente
+       socket_server = new QTcpServer(this);
 
+       //Tenemos que decirle al socket que escuche
+       socket_server->listen(QHostAddress::Any, 2000);
+
+       // al recibir una nueva peticion se crea el socket que conecta el servidor con el cliente
+       connect(socket_server, SIGNAL(newConnection()), this, SLOT(crear_conexiones()));
+
+       // esta seria la señal que conecta el cliente con el servidor
+       connect(clientConnection, SIGNAL(readyRead()), this, SLOT(recibir_imagen()));
 
 }
 
@@ -56,23 +68,49 @@ ImagineViewerWindow::~ImagineViewerWindow(){
 }
 
 
-void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QRect> &vector_rectangulos){
-    QImage imagen2 = imagen;
+void ImagineViewerWindow :: recibir_imagen(){
+   /*cuando ya recibimos la imagen tenemos que deserializar el mensaje, mostrar la imagen con el rectangulo,
+    *que por cierto hay que fijarle su valor en el mensaje en el cliente para poder tenerlo aqui */
 
 
-    QPainter pintura(&imagen2 );
-
-    pintura.drawRects(vector_rectangulos);
-
-
-    QPixmap pixmap = QPixmap::fromImage ( imagen2 );
+   /* QPixmap pixmap = QPixmap::fromImage ( imagen2 );
     // connvertir de imagen a pixmap con un metodo de Qpixmap
 
     ui->Image->setPixmap(pixmap);
+    */
+
+    const char *paquete =
+
+    clientConnection->read();
+
+
+    // Leer el mensaje
+    std::string buffer;
+
+    buffer.resize(sizeof(paquete));
+    buffer = paquete;
+
+    ifs.read(const_cast<char*>(buffer.c_str()), bufferSize);
+
+    // Deserializar
+    report.ParseFromString(buffer);
+    // ahora tenemos que deserializar el mensaje recibido y mostrar
+
+
 
 
 }
 
+void ImagineViewerWindow :: crear_conexiones(){
+
+    while(socket_server->hasPendingConnections()) {
+      clientConnection = new socket_server->nextPendingConnection();
+
+
+      emit clientConnection->readyRead();
+    }
+
+}
 
 void ImagineViewerWindow::on_pushButton_clicked(){
     qApp->quit();

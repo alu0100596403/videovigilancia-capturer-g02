@@ -5,7 +5,8 @@
 #include <QDebug>
 #include"procesadora.h"
 #include <QThread>
-
+#include <QTcpServer>
+#include <QTcpSocket>
 namespace Ui {
 class ImagineViewerWindow;
 }
@@ -25,7 +26,9 @@ class ImagineViewerWindow : public QMainWindow {
 
         void on_movie_updated(const QRect& rect);
 
-        void recibir_imagen(const QImage& imagen, const QVector<QRect>& vector_rectangulos); // este ademas recibe el vector de rectagulos y muestra la imagen y los rectangulos
+        void recibir_imagen();
+
+        void crear_conexiones();
 
     private:
         Ui::ImagineViewerWindow *ui;
@@ -33,10 +36,16 @@ class ImagineViewerWindow : public QMainWindow {
         QMovie *movie_;
         QThread workingThread_;
         Procesadora procesadora;
+        //socket del servidor
+        QTcpServer *socket_server;
+
+        // socket del cliente
+        QTcpSocket *clientConnection;
 
     signals:
         // Señal para comunicarnos con el hilo de trabajo
         void enviar_imagen(const QImage& imagen);
+
 };
 
 
