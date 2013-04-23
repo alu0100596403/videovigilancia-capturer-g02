@@ -41,6 +41,7 @@ class ImagineViewerWindow : public QMainWindow {
 
         // socket del cliente
         QTcpSocket *clientConnection;
+        int sz; //para que entre en el bucle
 
     signals:
         // Señal para comunicarnos con el hilo de trabajo

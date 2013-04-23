@@ -9,7 +9,7 @@
 #include <QMutex>
 #include <QDebug>
 #include <QPainter>
-
+#include<Mensaje.pb.h>
 
  //// ESTE ES EL CODIGO DEL SERVIDOR
 
@@ -24,7 +24,7 @@ QMutex mutex;
 
 
 ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::ImagineViewerWindow){
-
+    sz=0;
  movie_ = new QMovie();
     ui->setupUi(this);
 
@@ -39,7 +39,7 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
 
        // Señal de que se ha recibido la imagen
        connect(&procesadora, SIGNAL(devolver_senal(const QImage&, const QVector <QRect>)),
-           this, SLOT(recibir_imagen (const QImage&, const QVector <QRect>)));
+           this, SLOT(recibir_imagen ()));
 
 
        // Migrar la instancia de pocesadora al hilo de trabajo
@@ -57,8 +57,8 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
        // al recibir una nueva peticion se crea el socket que conecta el servidor con el cliente
        connect(socket_server, SIGNAL(newConnection()), this, SLOT(crear_conexiones()));
 
-       // esta seria la señal que conecta el cliente con el servidor
-       connect(clientConnection, SIGNAL(readyRead()), this, SLOT(recibir_imagen()));
+
+
 
 }
 
@@ -79,35 +79,45 @@ void ImagineViewerWindow :: recibir_imagen(){
     ui->Image->setPixmap(pixmap);
     */
 
-    const char *paquete =
+ QByteArray buffer;
 
-    clientConnection->read();
+ while(true){
+    if (sz == 0){
 
+        if (clientConnection->bytesAvailable()== sizeof(sz)){
 
-    // Leer el mensaje
-    std::string buffer;
+            clientConnection->read((char*)&sz, sizeof(sz));
+        }
+        else break;
 
-    buffer.resize(sizeof(paquete));
-    buffer = paquete;
+    }
 
-    ifs.read(const_cast<char*>(buffer.c_str()), bufferSize);
-
-    // Deserializar
-    report.ParseFromString(buffer);
-    // ahora tenemos que deserializar el mensaje recibido y mostrar
-
+    if ((sz != 0) && (clientConnection->bytesAvailable() == sz)){
+            buffer = clientConnection->read(sz);
 
 
+            // Leer el mensaje
+         std::string paquete(buffer.constData(), (size_t)buffer.size());
+
+         Mensaje message;
+          // Deserializar
+        message.ParseFromString(paquete);
+        // ahora tenemos que deserializar el mensaje recibido y mostrar
+        sz=0;
+    }
+    else break;
+}
 
 }
 
 void ImagineViewerWindow :: crear_conexiones(){
 
     while(socket_server->hasPendingConnections()) {
-      clientConnection = new socket_server->nextPendingConnection();
+      clientConnection = socket_server->nextPendingConnection();
 
+      // esta seria la señal que conecta el cliente con el servidor
+      connect(clientConnection, SIGNAL(readyRead()), this, SLOT(recibir_imagen()));
 
-      emit clientConnection->readyRead();
     }
 
 }
