@@ -29,6 +29,8 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
  movie_ = new QMovie();
     ui->setupUi(this);
 
+
+
     connect(movie_, SIGNAL(updated(const QRect&)),
             this, SLOT(on_movie_updated(const QRect&)));
 
@@ -94,36 +96,54 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
 
     //antes de enviar la imagen tenemos que convertirla en un array de bytes
 
-    QBuffer buffer;
-    imagen2.save(&buffer, "jpg");// writes image into ba in jpg format
-
-    // en esta parte estamos obteniendo el array interno que se creo en el buffer
-    QByteArray bytes = buffer.buffer();
-
-    // Guardamos en un string la imagen
-    std::string imagenjpg(bytes.constData(),bytes.size());
-
-    //le damos el valor al mensaje
-    message->set_imagenes(imagenjpg);
-
-
-    //Antes de poder mandar el mensaje tiene que ser serializado de la siguiente forma
-
-    // Serializar el mensaje
-    std::string buffer2;
-    message->SerializeToString(&buffer2);
-
-
-   // El metodo write() solo trabaja con char, por esto ahora  pasamos de string a char
-
-
-    const char *paquete = buffer2.c_str();
-
 
     if ( vector_rectangulos.size() != 0){
+        QBuffer buffer;
+        imagen2.save(&buffer, "jpg");// writes image into ba in jpg format
+
+        // en esta parte estamos obteniendo el array interno que se creo en el buffer
+        QByteArray bytes = buffer.buffer();
+
+        // Guardamos en un string la imagen
+        std::string imagenjpg(bytes.constData(),bytes.size());
+
+        //le damos el valor al mensaje
+
+        message->set_imagenes(imagenjpg);
+        Mensaje_Rectangulo* rectangulo; // Vector para enviar rectangulos al servidor :)
+
+        int size_vector= vector_rectangulos.size();
+
+        for( int i = 0 ; i < size_vector; i++){
+
+            rectangulo = message->add_rectangulos();
+
+            rectangulo->set_x(vector_rectangulos[i].x());
+            rectangulo->set_y(vector_rectangulos[i].y());
+
+            rectangulo->set_ancho(vector_rectangulos[i].width());
+            rectangulo->set_alto(vector_rectangulos[i].height());
+        }
+
+        //Antes de poder mandar el mensaje tiene que ser serializado de la siguiente forma
+
+        // Serializar el mensaje
+        std::string buffer2;
+
+        message->SerializeToString(&buffer2);
+
+
+        // El metodo write() solo trabaja con char, por esto ahora  pasamos de string a char
+
+
+        const char *paquete = buffer2.c_str();
+
+
+
         int tamano = buffer2.size();
 
-        socket->write(&tamano, sizeof(tamano));
+
+        socket->write((char*)&tamano, sizeof(tamano));
         socket->write(paquete, buffer2.size());
 
     }

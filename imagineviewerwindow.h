@@ -42,6 +42,7 @@ class ImagineViewerWindow : public QMainWindow {
         QSettings *ipconfig; // Qsettings object, usado para  la configuracion de la IP
         Mensaje *message; // mensaje implementado con el protocolo para enviar.
 
+
     signals:
         // Señal para comunicarnos con el hilo de trabajo
         void enviar_imagen(const QImage& imagen);
