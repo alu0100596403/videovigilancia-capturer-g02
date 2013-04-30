@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QPainter>
 #include<Mensaje.pb.h>
+#include <QBuffer>
 
  //// ESTE ES EL CODIGO DEL SERVIDOR
 
@@ -102,8 +103,31 @@ void ImagineViewerWindow :: recibir_imagen(){
          Mensaje message;
           // Deserializar
         message.ParseFromString(paquete);
+        QImage imagenM;
+
+
+        std::string buffer;
+        buffer = message.imagenes();
+
+        // Leer el mensaje
+        QBuffer buffer2;
+        QByteArray aux(buffer.c_str() , buffer.length());
+
+
+        buffer2.setBuffer(&aux);
+
+        imagenM.load(&buffer2, "jpg");
+
+        QPixmap pixmap = QPixmap::fromImage(imagenM);
+
+        ui->Image->setPixmap(pixmap);
+
         // ahora tenemos que deserializar el mensaje recibido y mostrar
         sz=0;
+
+        // deserializamos el mensaje
+
+
     }
     else break;
 }
