@@ -60,12 +60,13 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
       ipconfig = new QSettings("./Configuracion_IP.ini","IniFormat",this);
 
        //conectamos con el servidor
-       socket->connectToHost(ipconfig->value("IP").toString(),2000);
+       socket->connectToHost(ipconfig->value("IP").toString(),ipconfig->value("puerto").toInt());
 
        message = new Mensaje(); // inicializacion del mensaje.
 
 
 }
+
 
 
 ImagineViewerWindow::~ImagineViewerWindow(){
