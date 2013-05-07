@@ -92,7 +92,7 @@ void ImagineViewerWindow :: recibir_imagen(){
         if (clientConnection->bytesAvailable() >= sizeof(sz)){
 
             clientConnection->read((char*)&sz, sizeof(sz));
-            qDebug()<< "estoy mostrando sz: " << sz;
+
         }
         else break;
 
@@ -100,7 +100,7 @@ void ImagineViewerWindow :: recibir_imagen(){
 
     if ((sz != 0) && (clientConnection->bytesAvailable() >= sz)){
             buffer = clientConnection->read(sz);
-            qDebug()<< "estoy mostrando sz2: " << buffer.size();
+
 
             // Leer el mensaje
          std::string paquete(buffer.constData(), (size_t)buffer.size());
