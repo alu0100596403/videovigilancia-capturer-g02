@@ -60,9 +60,12 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
       ipconfig = new QSettings("./Configuracion_IP.ini","IniFormat",this);
 
        //conectamos con el servidor
-       socket->connectToHost(ipconfig->value("IP").toString(),ipconfig->value("puerto").toInt());
+       //socket->connectToHost(ipconfig->value("IP").toString(),ipconfig->value("puerto").toInt());
+        /*NO FUNCIONA EL FICHERO */
+      socket->connectToHost("10.254.113.118",2000);
+       connect(socket, SIGNAL(error ( QAbstractSocket::SocketError)),
+                              this, SLOT(ERROR(QAbstractSocket::SocketError)));
 
-       message = new Mensaje(); // inicializacion del mensaje.
 
 
 }
@@ -109,6 +112,8 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
         std::string imagenjpg(bytes.constData(),bytes.size());
 
         //le damos el valor al mensaje
+        Mensaje *message; // mensaje implementado con el protocolo para enviar.
+        message = new Mensaje(); // inicializacion del mensaje.
 
         message->set_imagenes(imagenjpg);
         Mensaje_Rectangulo* rectangulo; // Vector para enviar rectangulos al servidor :)
@@ -145,6 +150,7 @@ void ImagineViewerWindow :: recibir_imagen(const QImage& imagen,const QVector<QR
 
 
         socket->write((char*)&tamano, sizeof(tamano));
+          qDebug() << "Tamaño" << tamano;
         socket->write(paquete, buffer2.size());
 
     }
@@ -203,7 +209,9 @@ void ImagineViewerWindow::on_actionAbrir_triggered(){
 
 }
 
-
+void ImagineViewerWindow::ERROR(QAbstractSocket::SocketError socketError){
+    qDebug() << "ERROR" << socket->errorString();
+}
 
 
 void ImagineViewerWindow::on_movie_updated(const QRect& ){

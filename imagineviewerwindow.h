@@ -31,6 +31,7 @@ class ImagineViewerWindow : public QMainWindow {
 
         void recibir_imagen(const QImage& imagen, const QVector<QRect>& vector_rectangulos); // este ademas recibe el vector de rectagulos y muestra la imagen y los rectangulos
 
+        void ERROR(QAbstractSocket::SocketError socketError);
     private:
         Ui::ImagineViewerWindow *ui;
 
@@ -40,7 +41,6 @@ class ImagineViewerWindow : public QMainWindow {
 
         QTcpSocket  *socket; // socket, para conectar con el servidor
         QSettings *ipconfig; // Qsettings object, usado para  la configuracion de la IP
-        Mensaje *message; // mensaje implementado con el protocolo para enviar.
 
 
     signals:
