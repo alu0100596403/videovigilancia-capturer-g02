@@ -9,7 +9,7 @@
 #include <QMutex>
 #include <QDebug>
 #include <QPainter>
-#include<Mensaje.pb.h>
+#include <Mensaje.pb.h>
 #include <QBuffer>
 
  //// ESTE ES EL CODIGO DEL SERVIDOR
@@ -26,6 +26,8 @@ QMutex mutex;
 
 ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::ImagineViewerWindow){
     sz=0;
+
+    qDebug() << "HOLA :) ";
  movie_ = new QMovie();
     ui->setupUi(this);
 
@@ -59,6 +61,7 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
        connect(socket_server, SIGNAL(newConnection()), this, SLOT(crear_conexiones()));
 
 
+       qDebug() << "ADIOS :) ";
 
 
 }
@@ -82,20 +85,22 @@ void ImagineViewerWindow :: recibir_imagen(){
 
  QByteArray buffer;
 
+ qDebug()<< "Viendo error bytes: " << clientConnection->bytesAvailable();
+
  while(true){
     if (sz == 0){
-
-        if (clientConnection->bytesAvailable()== sizeof(sz)){
+        if (clientConnection->bytesAvailable() >= sizeof(sz)){
 
             clientConnection->read((char*)&sz, sizeof(sz));
+            qDebug()<< "estoy mostrando sz: " << sz;
         }
         else break;
 
     }
 
-    if ((sz != 0) && (clientConnection->bytesAvailable() == sz)){
+    if ((sz != 0) && (clientConnection->bytesAvailable() >= sz)){
             buffer = clientConnection->read(sz);
-
+            qDebug()<< "estoy mostrando sz2: " << buffer.size();
 
             // Leer el mensaje
          std::string paquete(buffer.constData(), (size_t)buffer.size());
@@ -136,6 +141,7 @@ void ImagineViewerWindow :: recibir_imagen(){
 
 void ImagineViewerWindow :: crear_conexiones(){
 
+    qDebug() << "Estoy creando una conexion";
     while(socket_server->hasPendingConnections()) {
       clientConnection = socket_server->nextPendingConnection();
 
