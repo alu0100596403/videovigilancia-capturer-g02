@@ -17,7 +17,7 @@ Procesadora::Procesadora(QObject *parent) :
 
 void Procesadora :: recibir_imagen(const QImage& imagen ) {
 
-     qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
+     //qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
 
          // channels == 0 significa autodetección
          cv::Mat imagenmat= QtOcv::image2Mat(imagen);

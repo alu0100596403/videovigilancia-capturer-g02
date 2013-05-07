@@ -26,14 +26,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         imagineviewerwindow.cpp \
-    procesadora.cpp \
-    Cliente.cpp
-
+    procesadora.cpp
 HEADERS  += \
     imagineviewerwindow.h \
     procesadora.h \
      cvmatandqimage \
      cvmatandqimage \
+    Mensaje.pb.h \
     servidor.h
 
 FORMS    += imagineviewerwindow.ui
@@ -42,3 +41,6 @@ OTHER_FILES += \
     opencv.pri \
     QtOpenCV.pri \
     Mensaje.proto
+
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += protobuf
