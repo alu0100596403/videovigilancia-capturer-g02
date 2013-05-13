@@ -53,18 +53,27 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
 
        //incializamos el socket :)
 
-       socket = new QTcpSocket(this); // Ahora recibimos la imagen con el moviento, tenmos que el v
+        socket = new QTcpSocket(this); // Ahora recibimos la imagen con el moviento, tenmos que el v
 
        //Aqui creamos un fichero de configuraciion, en el que vamos a poner la ip
 
-      ipconfig = new QSettings("./Configuracion_IP.ini","IniFormat",this);
-
-       //conectamos con el servidor
-       //socket->connectToHost(ipconfig->value("IP").toString(),ipconfig->value("puerto").toInt());
-        /*NO FUNCIONA EL FICHERO */
-      socket->connectToHost("10.254.113.118",2000);
        connect(socket, SIGNAL(error ( QAbstractSocket::SocketError)),
                               this, SLOT(ERROR(QAbstractSocket::SocketError)));
+
+        ipconfig = new QSettings("/home/adri/Documentos/Tercer_Ano/SOA/proyect/Configuracion_IP.ini",QSettings::IniFormat,this);
+
+
+       //conectamos con el servidor
+
+        socket->connectToHost(ipconfig->value("IP").toString(),ipconfig->value("puerto").toInt());
+
+       qDebug()<<"IP"<<ipconfig->value("IP").toString();
+       qDebug()<<"Puerto"<<ipconfig->value("puerto").toInt();
+
+
+        /*NO FUNCIONA EL FICHERO */
+      //socket->connectToHost("10.254.113.59",2000);
+
 
 
 
@@ -178,7 +187,7 @@ void ImagineViewerWindow::on_actionAbrir_triggered()
         QImageReader imagereade(&file);
         QPixmap Pixmap = QPixmap::fromImageReader(&imagereade);
         ui->Image->setPixmap(Pixmap);
-        file.close();
+        file.close();qDebug()
     }
 
 }
