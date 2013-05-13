@@ -30,7 +30,7 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
     qDebug() << "HOLA :) ";
  movie_ = new QMovie();
     ui->setupUi(this);
-
+    ipconfig = new QSettings("/home/Documentos/SOA/videovigilancia-capturer-g02/Configuracion_IP.ini",QSettings::IniFormat, this);
     connect(movie_, SIGNAL(updated(const QRect&)),
             this, SLOT(on_movie_updated(const QRect&)));
 
@@ -55,6 +55,7 @@ ImagineViewerWindow::ImagineViewerWindow(QWidget *parent) : QMainWindow(parent),
        socket_server = new QTcpServer(this);
 
        //Tenemos que decirle al socket que escuche
+
        socket_server->listen(QHostAddress::Any, 2000);
 
        // al recibir una nueva peticion se crea el socket que conecta el servidor con el cliente
@@ -90,6 +91,7 @@ void ImagineViewerWindow :: recibir_imagen(){
  while(true){
     if (sz == 0){
         if (clientConnection->bytesAvailable() >= sizeof(sz)){
+            qDebug()<< "Viendo error bytes2: " << clientConnection->bytesAvailable();
 
             clientConnection->read((char*)&sz, sizeof(sz));
 
@@ -97,6 +99,8 @@ void ImagineViewerWindow :: recibir_imagen(){
         else break;
 
     }
+
+    qDebug()<< "Viendo error bytes3: " << clientConnection->bytesAvailable();
 
     if ((sz != 0) && (clientConnection->bytesAvailable() >= sz)){
             buffer = clientConnection->read(sz);

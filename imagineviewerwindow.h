@@ -7,6 +7,8 @@
 #include <QThread>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QSettings>
+
 namespace Ui {
 class ImagineViewerWindow;
 }
@@ -33,6 +35,7 @@ class ImagineViewerWindow : public QMainWindow {
     private:
         Ui::ImagineViewerWindow *ui;
 
+        QSettings *ipconfig;
         QMovie *movie_;
         QThread workingThread_;
         Procesadora procesadora;
