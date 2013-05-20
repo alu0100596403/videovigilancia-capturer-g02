@@ -127,6 +127,22 @@ void ImagineViewerWindow :: recibir_imagen(){
 
         imagenM.load(&buffer2, "jpg");
 
+        QImage image2 = imagenM;
+        QPainter pintura(&image2);
+
+        QVector<QRect> rectangulo;
+
+
+
+        for (int i=0; i < message.rectangulos_size(); i++){
+
+            QRect Rectan(message.rectangulos(i).x(),message.rectangulos(i).y(),message.rectangulos(i).ancho(),message.rectangulos(i).alto());
+            rectangulo.push_back(Rectan);
+        }
+
+
+        pintura.drawRects(rectangulo);
+
         QPixmap pixmap = QPixmap::fromImage(imagenM);
 
         ui->Image->setPixmap(pixmap);
