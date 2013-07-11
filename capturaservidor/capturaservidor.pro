@@ -23,11 +23,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    servidor.cpp
+    servidor.cpp \
+    cliente.cpp
 
 HEADERS += \
     servidor.h \
-    Mensaje.pb.h
+    Mensaje.pb.h \
+    cliente.h
 
 OTHER_FILES += \
     Mensaje.proto

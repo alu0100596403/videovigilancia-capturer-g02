@@ -1,6 +1,7 @@
 #include "servidor.h"
 
 
+
 #include <QFile>
 #include <QWaitCondition>
 #include <QMutex>
@@ -10,13 +11,13 @@
 #include <QImage>
 
 
-Servidor::Servidor(QObject *parent) : QObject(parent) {
+Servidor::Servidor(QTcpServer *parent) : QTcpServer(parent) {
 
     sz=0;
     cont=0;
-    direct = new QDir("/home/alex/Documentos/SOA/videovigilancia-capturer-g02/");
 
     ipconfig = new QSettings("/home/alex/Documentos/SOA/videovigilancia-capturer-g02/Configuracion_IP.ini",QSettings::IniFormat, this);
+    direct = new QDir(ipconfig->value("ruta").toString());
 
 
     //AQUI SERIA PONER LOS CONECTORES de los slots
@@ -26,16 +27,27 @@ Servidor::Servidor(QObject *parent) : QObject(parent) {
 
       //Tenemos que decirle al socket que escuche
 
-      socket_server->listen(QHostAddress::Any, 2000);
+     // socket_server->listen(QHostAddress::Any, 2000);
+
+      socket_server->listen(QHostAddress::Any, ipconfig->value("puerto").toInt());
 
       // al recibir una nueva peticion se crea el socket que conecta el servidor con el cliente
       connect(socket_server, SIGNAL(newConnection()), this, SLOT(crear_conexiones()));
+}
 
 
+void Servidor :: incomingConnection(int IDs){
 
+    QThread hilo;
+    Cliente clien;
+    clien.setIDs(IDs);
+    hilo.start(clien);
+    QTcpSocket sockclient;
+    sockclient.setSocketDescriptor()
 
 
 }
+
 
 
 void Servidor :: crear_conexiones(){
@@ -43,6 +55,7 @@ void Servidor :: crear_conexiones(){
     qDebug() << "Estoy creando una conexion";
     while(socket_server->hasPendingConnections()) {
       clientConnection = socket_server->nextPendingConnection();
+
 
       // esta seria la señal que conecta el cliente con el servidor
       connect(clientConnection, SIGNAL(readyRead()), this, SLOT(recibir_imagen()));

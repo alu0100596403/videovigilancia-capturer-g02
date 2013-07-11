@@ -1,6 +1,8 @@
 #ifndef SERVIDOR_H
 #define SERVIDOR_H
 
+#include "cliente.h"
+
 #include <QObject>
 #include <QDebug>
 #include <QThread>
@@ -9,11 +11,14 @@
 #include <QSettings>
 #include <QDir>
 
-class Servidor : public QObject
+class Servidor : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit Servidor(QObject *parent = 0);
+    Servidor(QTcpServer *parent = 0);
+
+    void incomingConnection(int);
+
 
 
 private slots:
@@ -38,6 +43,9 @@ private:
 
         QDir *direct; //Nombre del directorio que vamos a crear para las imagenes
 
+        Cliente *ListaCliente; //Lista de clientes
+
+
 
 
     signals:
@@ -48,3 +56,6 @@ private:
 };
 
 #endif // SERVIDOR_H
+
+
+
