@@ -1,0 +1,17 @@
+
+message Mensaje {
+
+    required string deviceName = 1;     // Nombre de la camara 
+    required uint64 timestamp = 2;
+
+    required bytes imagenes = 3; //Vector de bytes
+
+    message Rectangulo {
+        required int32 X = 1;
+        required int32 Y = 2;
+        required int32 ancho = 3;
+        required int32 alto = 4;
+    }
+
+    repeated Rectangulo rectangulos = 4;  // lista de rectangulos.
+}
