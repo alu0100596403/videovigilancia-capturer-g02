@@ -3,16 +3,22 @@
 int Cliente ::cont;
 QMutex Cliente :: bloquear;
 
-Cliente::Cliente(int IDs) : QThread(){
+Cliente :: Cliente(int IDs) : QThread(){
 
     idsocket = IDs;
 
-    cont = 0;
+
 
     ipconfig = new QSettings("/home/adri/Documentos/Tercer_Ano/SOA/1/videovigilancia-capturer-g02/capturaservidor/Configuracion_IP.ini",QSettings::IniFormat, this);
     direct = new QDir(ipconfig->value("ruta").toString());
 
+    cont = ipconfig->value("cont").toInt();
 }
+
+int Cliente :: get_cont(){
+    return cont;
+}
+
 
 /*
 int Cliente::getIDs(){
@@ -65,8 +71,6 @@ while (true){
 
       if ((sz != 0) && (socket.bytesAvailable() >= sz)){
            buffer = socket.read(sz);
-           qDebug()<< "Estoy recibiendo una imagen toda bonita " ;
-
 
               // Leer el mensaje
            std::string paquete(buffer.constData(), (size_t)buffer.size());
@@ -113,18 +117,18 @@ while (true){
 
           bloquear.unlock();
 
+
           //Creamos el nombre de las imagenes en hexadecimal
 
 
           QString carpetasup = hexa2.left(4);
           QString carpetainf = hexa2.mid(5,4);
 
-          qDebug () << "Soy hexa: " << hexa2;
+  //        qDebug () << "Soy hexa: " << hexa2;
 
           //Creamos el nombre de la carpeta superior y las subcarpetas
 
           direct->mkdir(carpetasup);
-          qDebug () << "soy carpeta sup" << carpetasup ;
           direct->mkdir(carpetasup+"/"+carpetainf); //Concatenamos la ruta vieja, con nuestra carpeta inferior.
 
           image2.save(direct->path()+"/"+carpetasup+"/"+carpetainf+"/"+hexa2+".jpg", "jpg", -1);
@@ -138,3 +142,9 @@ while (true){
 }
 
 }
+
+Cliente::~Cliente(){
+
+        ipconfig->setValue("cont", cont);
+    }
+

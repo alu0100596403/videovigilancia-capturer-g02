@@ -11,6 +11,9 @@
 #include <QSettings>
 #include <QDir>
 #include<QVector>
+#include<QSocketNotifier>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 class Servidor : public QTcpServer
 {
@@ -20,18 +23,31 @@ public:
 
     void incomingConnection(qintptr);
 
+    // Manejadores de señal POSIX
+    static void hupSignalHandler(int unused);
+    static void termSignalHandler(int unused);
 
+    ~Servidor();
 
-private slots:
+public slots:
+
+    // Slots Qt donde atender las señales POSIX
+    void handleSigHup();
+    void handleSigTerm();
 
 
 private:
 
-        QSettings *ipconfig; // fichero de configuracion
-
-
-
+       QSettings *ipconfig; // fichero de configuracion
        QVector <Cliente*> ListaCliente; //Lista de clientes
+
+       // Pares de sockets. Un par por señal a manejar
+       static int sigHupSd[2];
+       static int sigTermSd[2];
+
+       // Objetos para monitorizar los pares de sockets
+       QSocketNotifier *sigHupNotifier;
+       QSocketNotifier *sigTermNotifier;
 
 
 

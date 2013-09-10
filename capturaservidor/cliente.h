@@ -20,13 +20,15 @@ class Cliente : public QThread
     Q_OBJECT
 public:
     Cliente(int);
-
+       ~Cliente();
 
 signals:
     
 public slots:
 
      void run(); // en este
+     int get_cont();
+
 private:
 
     int idsocket;
